@@ -27,7 +27,7 @@
 | Reply   | [ACCEPT]    | 플레이어가 올바른 위치에 돌을 놓았다고 알린다. |
 | Notify  | [ENTER]name | ID가 name인 상대가 접속되는 것을 알린다. |
 | Notify  | [TIMEOUT]   | 시간이 초과하여 패배함을 알림 |
-| Notify  | [PASS]1 1   | 상대가 1행 1열에 돌을 두어 자신이 놓을 곳이 없음을 알린다. |
+| Notify  | [PASS]1 1   | 상대가 1행 1열에 돌을 두어 자신이 놓을 곳이 없음을 알린다. 또한 상대가 마지막에 돌을 둘 때 플레이어에게 알리기  사용한다. |
 | Notify  | [EXIT]      | 상대가 나감을 알린다.(알수없는 오류로 인해 나갈 때도 포함) |
 | Notify  | [WIN]       | 게임에서 승리함을 알린다. |
 | Notify  | [LOSS]      | 게임에서 패배함을 알린다. |
@@ -44,3 +44,40 @@
 #### 3. 상관관계
 
 상관관계에서는 어떤 Request가 요청되면 Reply 응답을 하는지에 대해 설명한다. 
+
+#### 4. 통신흐름
+
+게임을 진행하면서 발생할 수 있는 통신흐름을 다음과 같이 그림으로 표현하였다.
+
+##### 4-1. 게임 접속 성공
+
+<img src="https://user-images.githubusercontent.com/39123255/51219356-e545c880-1973-11e9-9a0c-f7533153763b.png" width=500></p>
+
+#### 4-2. 자리가 없어 게임 접속 실패
+
+<img src="https://user-images.githubusercontent.com/39123255/51219421-41105180-1974-11e9-8f25-1fce480d463a.png" width=500></p>
+
+#### 4-3. 게임 준비
+
+<img src="https://user-images.githubusercontent.com/39123255/51219522-a95f3300-1974-11e9-9541-444bf6f514b2.png" width=500></p>
+
+#### 4-4. 게임 시작
+서버에서 각 플레이어에게 [START] 명령을 내리면 [COME]black 명령을 받을 플레이어가 먼저 돌을 놓는다.
+
+<img src="https://user-images.githubusercontent.com/39123255/51219582-db709500-1974-11e9-9355-2421ce555df7.png" width=500></p>
+
+#### 4-5. 플레이어가 돌을 놓을 수 없는 곳에 돌을 놓았을 때
+
+<img src="https://user-images.githubusercontent.com/39123255/51219695-55a11980-1975-11e9-933f-9c653b027f29.png" width=500></p>
+
+#### 4-6. PASS 발생
+
+<img src="https://user-images.githubusercontent.com/39123255/51219729-87b27b80-1975-11e9-99f0-f64c1688fe93.png" width=500></p>
+
+#### 4-7. TIMEOUT 발생
+
+<img src="https://user-images.githubusercontent.com/39123255/51219803-e2e46e00-1975-11e9-89ec-53ed7b99f03b.png" width=500></p>
+
+#### 4-8. 게임 종료
+
+<img src="https://user-images.githubusercontent.com/39123255/51220163-7bc7b900-1977-11e9-8155-e1551931c92f.png" width=500></p>
