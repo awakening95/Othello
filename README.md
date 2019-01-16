@@ -16,21 +16,22 @@
 
 #### 1. Server
 
-| 종류    | 명령         | 의미 |
-  ------- | -------     | -------
-| Request | [TURN]1 1   | 상대 플레이어가 1행 1열에 돌을 둔 것을 알리고 플레이어에게 돌을 놓으라고 요청한다. 게임을 시작할 때 가장 먼저 돌을 놓는 플레이어에게는 DATA를 포함하지 않고 [TURN]만 보낸다. |
-| Request | [AGAIN]     | 상대 플레이어가 돌을 놓을 수 없어 플레이어에게 한번 더 돌을 놓으라고 요청한다. |
-| Request | [MISS]      | 플레이어가 돌을 놓을 수 없는 곳에 놓아 다시 돌을 놓으라고 요청한다. |
-| Reply   | [COME]black | 플레이어가 사용할 돌의 색(black, white)과 함께 접속된 것을 알린다. |
-| Reply   | [FULL]      | 플레이어에게 자리가 없는 것을 알리고 연결을 끊는다. |
-| Notify  | [ENTER]name | ID가 name인 상대 플레이어가 접속한 것을 알린다. |
-| Notify  | [START]60   | 플레이어 모두가 준비가 되면 턴당 제한시간(60초)과 함께 게임이 시작된 것을 알린다. |
-| Notify  | [ACCEPT]    | 플레이어가 올바른 위치에 돌을 놓았다고 알린다. |
-| Notify  | [PASS]1 1   | 상대 플레이어가 1행 1열에 돌을 두어 자신이 놓을 곳이 없음을 알린다. 또한 상대 플레이어가 마지막 돌을 둘 때 플레이어에게 알리기 위해 사용한다. |
-| Notify  | [TIMEOUT]   | 시간이 초과하여 플레이어가 패배함을 알린다. |
-| Notify  | [EXIT]      | 상대 플레이어가 게임을 종료한 것을 알린다.(알수없는 오류로 인해 종료할 때도 포함) |
-| Notify  | [WIN]       | 플레이어가 게임에서 승리함을 알린다. |
-| Notify  | [LOSS]      | 플레이어가 게임에서 패배함을 알린다. |
+| 종류    | 명령            | 의미 |
+  ------- | -------        | -------
+| Request | [TURN]1 1      | 상대 플레이어가 1행 1열에 돌을 둔 것을 알리고 플레이어에게 돌을 놓으라고 요청한다. 게임을 시작할 때 가장 먼저 돌을 놓는 플레이어에게는 DATA를 포함하지 않고 [TURN]만 보낸다. |
+| Request | [AGAIN]        | 상대 플레이어가 돌을 놓을 수 없어 플레이어에게 한번 더 돌을 놓으라고 요청한다. |
+| Request | [MISS]         | 플레이어가 돌을 놓을 수 없는 곳에 놓아 다시 돌을 놓으라고 요청한다. |
+| Reply   | [COME]black    | 플레이어가 사용할 돌의 색(black, white)과 함께 접속된 것을 알린다. |
+| Reply   | [FULL]         | 플레이어에게 자리가 없는 것을 알리고 연결을 끊는다. |
+| Notify  | [ENTER]name    | ID가 name인 상대 플레이어가 접속한 것을 알린다. |
+| Notify  | [START]60      | 플레이어 모두가 준비가 되면 턴당 제한시간(60초)과 함께 게임이 시작된 것을 알린다. |
+| Notify  | [ACCEPT]       | 플레이어가 올바른 위치에 돌을 놓았다고 알린다. |
+| Notify  | [PASS]1 1      | 상대 플레이어가 1행 1열에 돌을 두어 자신이 놓을 곳이 없음을 알린다. 또한 상대 플레이어가 마지막 돌을 둘 때 플레이어에게 알리기 위해 사용한다. |
+| Notify  | [TIMEOUT WIN]  | 상대 플레이어가 시간을 초과하여 플레이어가 승리함을 알린다. |
+| Notify  | [TIMEOUT LOSS] | 플레이어가 시간을 초과하여 상대 플레이어가 승리함을 알린다. |
+| Notify  | [EXIT]         | 상대 플레이어가 게임을 종료한 것을 알린다.(알수없는 오류로 인해 종료할 때도 포함) |
+| Notify  | [WIN]          | 플레이어가 게임에서 승리함을 알린다. |
+| Notify  | [LOSS]         | 플레이어가 게임에서 패배함을 알린다. |
 
 #### 2. Client
 
@@ -82,9 +83,9 @@ Client1이 [PUT]8 1 명령으로 8행 1열에 돌을 놓겠다는 것을 서버�
 <img src="https://user-images.githubusercontent.com/39123255/51224745-b0913b80-198a-11e9-81e4-98512ba9d084.png" width=500></p>
 
 ##### 4-7. TIMEOUT 발생
-서버에서 각 Client에게 [START]60 명령으로 알려준 턴당 제한시간을 어떤 Client가 초과할 경우 해당 Client는 Server로 부터 [TIMEOUT] 명령과 [LOSS] 명령을 받아 시간제한으로 게임에 패배함을 확인하고 상대 Client에게는 [WIN] 명령을 전달해 게임에 승리함을 알린다.
+서버에서 각 Client에게 [START]60 명령으로 알려준 턴당 제한시간을 어떤 Client가 초과할 경우 해당 Server는 해당 Client에게 [TIMEOUT LOSS] 명령으로 시간제한으로 게임에 패배함을 알린다. 그리고 Server에서 상대 Client에게 [TIMEOUT WIN] 명령으로 게임에 승리함을 알린다.
 
-<img src="https://user-images.githubusercontent.com/39123255/51224945-afacd980-198b-11e9-823f-33f7c61bdfb6.png" width=500></p>
+<img src="https://user-images.githubusercontent.com/39123255/51228086-62843400-199a-11e9-8010-ac2441722045.png" width=500></p>
 
 ##### 4-8. 게임 종료
 Client2가 마지막 돌을 놓으면 Server에서는 Client1에게 [PASS]4 6 명령으로 Client2가 놓은 돌의 위치를 알려준다. 그리고 Server에서 결과를 계산한 다음 Client2에게는 [LOSS] 명령으로 패배를 알리고 Client1에게는 [WIN] 명령으로 승리를 알린다.
