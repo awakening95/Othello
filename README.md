@@ -47,7 +47,7 @@
 
 Request-Reply 상관관계에서는 어떤 Request가 요청되면 Reply 응답을 하는지에 대해 설명한다. 
 
-<img src="https://user-images.githubusercontent.com/39123255/51222709-4e343d00-1982-11e9-9ad6-ede33741e8de.png" width=500></p>
+<img src="https://user-images.githubusercontent.com/39123255/51222709-4e343d00-1982-11e9-9ad6-ede33741e8de.png" width=1000></p>
 
 #### 4. 통신흐름
 
