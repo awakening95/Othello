@@ -81,7 +81,7 @@ Client 프로그램의 문제로 플레이어가 놓을 수 없는 곳에 돌을
 ##### 4-6. PASS 발생
 Client1이 [PUT]8 1 명령으로 8행 1열에 돌을 놓겠다는 것을 서버에 알린 후 서버에서 Client2가 돌을 놓을 수 있는 곳이 없다고 확인되면 Client1에게 [AGAIN] 명령으로 한 번더 돌을 놓으라고 요청하며 Client2에게는 [PASS]8 1 명령으로 Client1이 돌을 놓은 위치와 Client2가 돌을 놓을 곳이 없다는 것을 알린다. 
 
-<img src="https://user-images.githubusercontent.com/39123255/51224745-b0913b80-198a-11e9-81e4-98512ba9d084.png" width=500></p>
+<img src="https://user-images.githubusercontent.com/39123255/51229958-a9c1f300-19a1-11e9-9d1a-de2e78e109f3.png" width=500></p>
 
 ##### 4-7. TIMEOUT 발생
 서버에서 각 Client에게 [START]60 명령으로 알려준 턴당 제한시간을 어떤 Client가 초과할 경우 해당 Server는 해당 Client에게 [TIMEOUT LOSS] 명령으로 시간제한으로 게임에 패배함을 알린다. 그리고 Server에서 상대 Client에게 [TIMEOUT WIN] 명령으로 게임에 승리함을 알린다.
