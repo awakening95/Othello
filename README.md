@@ -51,7 +51,7 @@
 
 ##### 4-1. 게임 접속 성공
 
-<img src="https://user-images.githubusercontent.com/39123255/51219356-e545c880-1973-11e9-9a0c-f7533153763b.png" width=500></p>
+<img src="https://user-images.githubusercontent.com/39123255/51220448-9babac80-1978-11e9-8ca4-39c8566dcc54.png" width=500></p>
 
 ##### 4-2. 자리가 없어 게임 접속 실패
 
