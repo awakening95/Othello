@@ -62,7 +62,7 @@ Client에서 [JOIN]name 명령으로 접속을 요청하였으나 자리가 없�
 <img src="https://user-images.githubusercontent.com/39123255/51219421-41105180-1974-11e9-8f25-1fce480d463a.png" width=500></p>
 
 ##### 4-3. 게임 준비
-Client에소 [READY] 명령으로 게임할 준비가 되었음을 서버에 알리고 Server에서는 Client 모두가 준비되면 각 Client에게 [START]60 명령으로 턴당 제한시간(60초)과 게임이 시작되었음을 알린다. 그리고 만약 한 Client가 [UNREADY] 명령으로 게임을 할 준비가 되지 않았음을 서버에 알리면 해당 Client가 [READY] 명령을 서버에 알릴 때까지 게임을 시작하지 않는다.
+Client에서 [READY] 명령으로 게임할 준비가 되었음을 서버에 알리고 Server에서는 Client 모두가 준비되면 각 Client에게 [START]60 명령으로 턴당 제한시간(60초)과 게임이 시작되었음을 알린다. 그리고 만약 한 Client가 [UNREADY] 명령으로 게임을 할 준비가 되지 않았음을 서버에 알리면 해당 Client가 [READY] 명령을 서버에 알릴 때까지 게임을 시작하지 않는다.
 
 <img src="https://user-images.githubusercontent.com/39123255/51224178-1a5c1600-1988-11e9-9d9c-5d3bd7d30fd7.png" width=500></p>
 
