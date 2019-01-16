@@ -52,34 +52,41 @@ Request-Reply 상관관계에서는 어떤 Request가 요청되면 Reply 응답�
 게임을 진행하면서 발생할 수 있는 통신흐름을 다음과 같이 그림으로 표현하였다.
 
 ##### 4-1. 게임 접속 성공
+클라이언트에서 [JOIN]name 명령으로 접속을 요청한 뒤 접속이 가능하면 서버에서 [COME]black 또는 [COME]white 명령으로 접속이 되었음과 플레이어가 사용할 돌의 색을 알리고 [ENTER]name 명령으로 ID가 name인 상대가 접속하였음을 알린다.
 
-<img src="https://user-images.githubusercontent.com/39123255/51220448-9babac80-1978-11e9-8ca4-39c8566dcc54.png" width=500></p>
+<img src="https://user-images.githubusercontent.com/39123255/51222966-4c1eae00-1983-11e9-8357-f666458d6240.png" width=500></p>
 
 ##### 4-2. 자리가 없어 게임 접속 실패
+클라이언트에서 [JOIN]name 명령으로 접속을 요청하였으나 자리가 없을 경우 서버에서 [FULL] 명령으로 접속할 수 없음을 알린다.
 
 <img src="https://user-images.githubusercontent.com/39123255/51219421-41105180-1974-11e9-8f25-1fce480d463a.png" width=500></p>
 
 ##### 4-3. 게임 준비
+플레이어는 게임할 준비가 되면 [READY] 명령을 서버에 알린 뒤 서버에서는 플레이어 모두가 준비가 되면 [START]60 명령으로 턴당 제한시간과 게임이 시작되었음을 알린다. 그리고 만약 한 플레이어가 [UNREADY] 명령을 서버에 알리면 해당 플레이어가 [READY] 명령을 서버에 알릴 때까지 게임을 시작하지 않는다.
 
 <img src="https://user-images.githubusercontent.com/39123255/51219522-a95f3300-1974-11e9-9541-444bf6f514b2.png" width=500></p>
 
 ##### 4-4. 게임 시작
-서버에서 각 플레이어에게 [START] 명령을 내리면 [COME]black 명령을 받을 플레이어가 먼저 돌을 놓는다.
+서버에서 각 플레이어에게 [START] 명령을 내린 후 서버에서 [TURN] 명령을 받은 플레이어가 먼저 돌을 놓는다. 플레이어는 [PUT]5 6 명령과 같이 몇 행, 몇 열에 돌을 놓을건지 서버에게 알리고 정상적으로 처리될 경우 서버에서는 [ACCEPT] 명령을 해당 플레이어에게 보낸다. 그리고 서버에서 상대 플레이어에게 [TURN]5 6 명령으로 상대가 돌을 놓은 위치와 함께 자신이 돌을 놓을 차례임을 알린다.  
 
 <img src="https://user-images.githubusercontent.com/39123255/51221536-3908df80-197d-11e9-88fe-f8c3200c77a0.png" width=500></p>
 
 ##### 4-5. 플레이어가 돌을 놓을 수 없는 곳에 돌을 놓았을 때
+클라이언트 프로그램의 문제로 플레이어가 놓을 수 없는 곳에 돌을 놓을 경우(서버에서는 문제가 없다고 가정) 서버에서 [MISS] 명령으로 다른 곳에 놓으라고 요청한다.
 
 <img src="https://user-images.githubusercontent.com/39123255/51219695-55a11980-1975-11e9-933f-9c653b027f29.png" width=500></p>
 
 ##### 4-6. PASS 발생
+플레이어가 [PUT]8 2 명령을 서버에 내린 후 서버에서 상대 플레이어가 돌을 놓을 수 있는 곳이 없다고 확인되면 플레이어에게 [AGAIN] 명령으로 한 번더 돌을 놓으라고 요청하고 상대 플레이어에게는 [PASS]8 2 명령으로 플레이어가 돌을 놓은 위치와 돌을 놓을 곳이 없다는 것을 알린다. 
 
 <img src="https://user-images.githubusercontent.com/39123255/51219729-87b27b80-1975-11e9-99f0-f64c1688fe93.png" width=500></p>
 
 ##### 4-7. TIMEOUT 발생
+[START]60 명령으로 알려준 턴당 제한시간을 초과할 경우 해당 플레이어는 [TIMEOUT] 명령을 받고 [LOSS] 명령을 받아 시간제한으로 게임에 패배함을 알리고 상대 플레이어에게는 [WIN] 명령을 전달해 게임에 승리함을 알린다.
 
 <img src="https://user-images.githubusercontent.com/39123255/51219803-e2e46e00-1975-11e9-89ec-53ed7b99f03b.png" width=500></p>
 
 ##### 4-8. 게임 종료
+플레이어가 마지막 돌을 놓으면 서버에서는 상대 플레이어에게 [PASS]4 6 명령으로 플레이어가 놓은 돌의 위치를 알려준다. 그리고 서버에서 패자에게는 [LOSS] 명령을 전달하고 승자에게는 [WIN] 명령을 전달한다.
 
 <img src="https://user-images.githubusercontent.com/39123255/51220163-7bc7b900-1977-11e9-8155-e1551931c92f.png" width=500></p>
