@@ -96,9 +96,9 @@ Client2가 마지막 돌을 놓으면 Server에서는 Client1에게 [PASS]4 6 �
 ##### 4-9. 게임 시작 전 종료
 게임 시작 전 Client2가 게임을 종료하면 Client1에 [EXIT] 명령으로 상대 플레이어가 게임을 종료함을 알린다.
 
-<img src="https://user-images.githubusercontent.com/39123255/51228300-4208a980-199b-11e9-8a11-95f1971651ec.png" width=500></p>
+<img src="https://user-images.githubusercontent.com/39123255/51228544-5b5e2580-199c-11e9-84c3-e8fee6b8e278.png" width=500></p>
 
 ##### 4-10. 게임 시작 후 종료
 게임 시작 후 Client2가 게임을 종료하면 Client1에 [EXIT WIN] 명령으로 상대 플레이어가 게임을 종료하여 게임에 승리함을 알린다.
 
-<img src="https://user-images.githubusercontent.com/39123255/51228433-e1c63780-199b-11e9-9b48-99810bea9a27.png" width=500></p>
+<img src="https://user-images.githubusercontent.com/39123255/51228571-6a44d800-199c-11e9-8792-d80ba97b530c.png" width=500></p>
