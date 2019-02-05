@@ -16,5 +16,4 @@ class Network(QThread):
     def run(self):
         while True:
             msg = deserialize(self.sock)
-            print(msg)
             self.server_msg.emit(msg)

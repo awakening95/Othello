@@ -27,7 +27,7 @@ def getReversedPosition(map, color, x, y):
     result = []
     for dir in direction:  # 모든 방향으로 탐색
         tmpList = chkArrow(map, color, x, y, dir)  # 해당 방향에 뒤집을 돌 리스트
-        if tmpList:  # 뒤집을 돌 있냐?
+        if tmpList:  # 뒤집을 돌 있냐
             result += tmpList  # 리스트 추가
     return result  # 뒤집을 수 있는 돌 모두 리턴
 

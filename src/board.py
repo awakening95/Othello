@@ -16,24 +16,29 @@ from src.deta_def import *
 from random import *
 import time
 from src.processing import *
+from src.minimax import *
+from datetime import datetime
 
 
 class Ui_MainWindow(object):
     def __init__(self, ip):
         self.ip = ip
-        self.my_stone_color = 0  # 1: black, 2: white
-        self.opponent_stone_color = 0
-        self.point = [0, 0]
-        self.client_msg = b''
+        self.my_stone_color = None  # 1: black, 2: white
+        self.opponent_stone_color = None
+        self.val = None
+        self.point = None
+        self.available_position_num = None
+        self.changed_points = None
+        self.client_msg = None
         self.pushButton = [[0 for _ in range(8)] for _ in range(8)]
-        self.board = [[0, 0, 0, 0, 0, 0, 0, 0],
-                      [0, 0, 0, 0, 0, 0, 0, 0],
-                      [0, 0, 0, 0, 0, 0, 0, 0],
-                      [0, 0, 0, 2, 1, 0, 0, 0],
-                      [0, 0, 0, 1, 2, 0, 0, 0],
-                      [0, 0, 0, 0, 0, 0, 0, 0],
-                      [0, 0, 0, 0, 0, 0, 0, 0],
-                      [0, 0, 0, 0, 0, 0, 0, 0]]
+        self.alpha = -4096
+        self.beta = 4096
+
+        self.board = np.zeros((8, 8), dtype=int)
+        self.board[3][3] = STONE_COLOR.WHITE.value
+        self.board[3][4] = STONE_COLOR.BLACK.value
+        self.board[4][3] = STONE_COLOR.BLACK.value
+        self.board[4][4] = STONE_COLOR.WHITE.value
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -524,7 +529,8 @@ class Ui_MainWindow(object):
         self.network.start()
 
     def msg_from_server_to_client(self, msg):
-        time.sleep(0.5)
+        time.sleep(0.3)
+        # print(msg)
         if msg["type"] == 0:  # READY
             self.label_3.setText("<p align=\"center\"><span style=\" font-size:20pt; font-weight:600;\">READY</span></p>")
 
@@ -560,27 +566,38 @@ class Ui_MainWindow(object):
                 self.label_5.setPixmap(pixmap)
 
         elif msg["type"] == 2:  # TURN
-            self.label_3.setText("<p align=\"center\"><span style=\" font-size:20pt; font-weight:600;\">YOUR<br>TURN</span></p>")
+            self.label_3.setText("<p align=\"center\"><span style=\" font-size:20pt; font-weight:600;\">MY<br>TURN</span></p>")
 
             if msg["opponent_put"] is not None:
                 self.board[msg["opponent_put"][0]][msg["opponent_put"][1]] = self.opponent_stone_color
                 self.rendering(self.opponent_stone_color, msg["opponent_put"][0], msg["opponent_put"][1])
 
-                for i in range(len(msg["changed_points"])):
-                    self.rendering(self.opponent_stone_color, msg["changed_points"][i][0], msg["changed_points"][i][1])
-                self.put_stone(msg["available_points"])
+                for i, j in msg["changed_points"]:
+                    self.board[i, j] = self.opponent_stone_color
+                    self.rendering(self.opponent_stone_color, i, j)
 
+            if len(np.where(self.board == 0)[0]) > 11:
+                self.val, self.point = minimax(self.board, 5, self.alpha, self.beta, True, self.my_stone_color,
+                                               self.opponent_stone_color, 0)
             else:
-                self.put_stone(msg["available_points"])
+                self.val, self.point = get_max_my_stone(self.board, len(np.where(self.board == 0)[0]), self.alpha,
+                                                        self.beta, True, self.my_stone_color, self.opponent_stone_color,
+                                                        0)
+
+            self.client_msg = serialize({'type': 0, 'point': self.point})
+            self.sock.send(self.client_msg)
 
         elif msg["type"] == 3:  # ACCEPT
             self.label_3.setText("<p align=\"center\"><span style=\" font-size:20pt; font-weight:600;\">OPPONENT<br>TURN</span></p>")
 
-            self.rendering(self.my_stone_color, self.point[0], self.point[1])
             self.changed_points = getReversedPosition(self.board, self.my_stone_color, self.point[0], self.point[1])
 
-            for i in range(len(self.changed_points)):
-                self.rendering(self.my_stone_color, self.changed_points[i][0], self.changed_points[i][1])
+            for i, j in self.changed_points:
+                self.board[i, j] = self.my_stone_color
+                self.rendering(self.my_stone_color, i, j)
+
+            self.board[self.point[0], self.point[1]] = self.my_stone_color
+            self.rendering(self.my_stone_color, self.point[0], self.point[1])
 
         elif msg["type"] == 5:  # NOPOINT
             self.label_3.setText("<p align=\"center\"><span style=\" font-size:20pt; font-weight:600;\">PASS</span></p>")
@@ -588,16 +605,18 @@ class Ui_MainWindow(object):
             self.board[msg["opponent_put"][0]][msg["opponent_put"][1]] = self.opponent_stone_color
             self.rendering(self.opponent_stone_color, msg["opponent_put"][0], msg["opponent_put"][1])
 
-            for i in range(len(msg["changed_points"])):
-                self.rendering(self.opponent_stone_color, msg["changed_points"][i][0], msg["changed_points"][i][1])
+            for i, j in msg["changed_points"]:
+                self.board[i, j] = self.opponent_stone_color
+                self.rendering(self.opponent_stone_color, i, j)
 
         elif msg["type"] == 6:  # GAMEOVER
             try:
                 self.board[msg["opponent_put"][0]][msg["opponent_put"][1]] = self.opponent_stone_color
                 self.rendering(self.opponent_stone_color, msg["opponent_put"][0], msg["opponent_put"][1])
 
-                for i in range(len(msg["changed_points"])):
-                    self.rendering(self.opponent_stone_color, msg["changed_points"][i][0], msg["changed_points"][i][1])
+                for i, j in msg["changed_points"]:
+                    self.board[i, j] = self.opponent_stone_color
+                    self.rendering(self.opponent_stone_color, i, j)
 
             except KeyError:
                 pass
@@ -610,6 +629,8 @@ class Ui_MainWindow(object):
         elif msg["type"] == 7:  # ERROR
             self.label_3.setText("<p align=\"center\"><span style=\" font-size:20pt; font-weight:600;\">ERROR</span></p>")
 
+        # print(self.board)
+
     def retranslateUi(self, MainWindow):
         _translate = QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
@@ -619,23 +640,10 @@ class Ui_MainWindow(object):
         self.label_2.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-size:20pt; font-weight:600;\">나</span></p></body></html>"))
         self.label_4.setText(_translate("MainWindow", "<html><head/><body><p><br/></p></body></html>"))
 
-    def put_stone(self, available_points):
-        self.point = available_points[randint(0, len(available_points) - 1)]
-        self.client_msg = serialize({'type': 0, 'point': self.point})
-        self.sock.send(self.client_msg)
-
     def rendering(self, stone_color, x, y):
-        self.board[x][y] = stone_color
-
         if stone_color == STONE_COLOR.BLACK.value:
             self.pushButton[x][y].setIcon(QIcon('../images/black_stone.png'))
-
         elif stone_color == STONE_COLOR.WHITE.value:
             self.pushButton[x][y].setIcon(QIcon('../images/white_stone.png'))
 
         self.pushButton[x][y].setIconSize(QSize(55, 55))
-
-        for i in range(8):
-            print(self.board[i])
-        print("\n")
-
