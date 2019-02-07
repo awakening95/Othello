@@ -31,8 +31,6 @@ class Ui_MainWindow(object):
         self.changed_points = None
         self.client_msg = None
         self.pushButton = [[0 for _ in range(8)] for _ in range(8)]
-        self.alpha = -4096
-        self.beta = 4096
 
         self.board = np.zeros((8, 8), dtype=int)
         self.board[3][3] = STONE_COLOR.WHITE.value
@@ -576,8 +574,7 @@ class Ui_MainWindow(object):
                     self.board[i, j] = self.opponent_stone_color
                     self.rendering(self.opponent_stone_color, i, j)
 
-            self.val, self.point = minimax(self.board, 1, self.alpha, self.beta, True, self.my_stone_color,
-                                           self.opponent_stone_color, 0)
+            self.point = ai()
 
             self.client_msg = serialize({'type': 0, 'point': self.point})
             self.sock.send(self.client_msg)
