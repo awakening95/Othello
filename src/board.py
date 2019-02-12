@@ -13,11 +13,11 @@ from PyQt5.QtGui import *
 from src.network import *
 from src.util import *
 from src.deta_def import *
-from random import *
 import time
 from src.processing import *
 from src.minimax import *
 from datetime import datetime
+from src.mcts import *
 
 
 class Ui_MainWindow(object):
@@ -25,14 +25,8 @@ class Ui_MainWindow(object):
         self.ip = ip
         self.my_stone_color = None  # 1: black, 2: white
         self.opponent_stone_color = None
-        self.val = None
         self.point = None
-        self.available_position_num = None
-        self.changed_points = None
-        self.client_msg = None
         self.pushButton = [[0 for _ in range(8)] for _ in range(8)]
-        self.alpha = -4096
-        self.beta = 4096
 
         self.board = np.zeros((8, 8), dtype=int)
         self.board[3][3] = STONE_COLOR.WHITE.value
@@ -529,8 +523,6 @@ class Ui_MainWindow(object):
         self.network.start()
 
     def msg_from_server_to_client(self, msg):
-        time.sleep(0.3)
-        # print(msg)
         if msg["type"] == 0:  # READY
             self.label_3.setText("<p align=\"center\"><span style=\" font-size:20pt; font-weight:600;\">READY</span></p>")
 
@@ -566,6 +558,7 @@ class Ui_MainWindow(object):
                 self.label_5.setPixmap(pixmap)
 
         elif msg["type"] == 2:  # TURN
+            time1 = datetime.now()
             self.label_3.setText("<p align=\"center\"><span style=\" font-size:20pt; font-weight:600;\">MY<br>TURN</span></p>")
 
             if msg["opponent_put"] is not None:
@@ -576,23 +569,32 @@ class Ui_MainWindow(object):
                     self.board[i, j] = self.opponent_stone_color
                     self.rendering(self.opponent_stone_color, i, j)
 
-            if len(np.where(self.board == 0)[0]) > 11:
-                self.val, self.point = minimax(self.board, 5, self.alpha, self.beta, True, self.my_stone_color,
-                                               self.opponent_stone_color, 0)
+            if len(np.where(self.board == 0)[0]) > 12 \
+                    and (self.board[0][0] == 0 or self.board[7][0] == 0 or self.board[0][7] == 0 or self.board[7][7] == 0):
+                val, self.point = minimax(self.board, 6, -4096, 4096, True, self.my_stone_color,
+                                          self.opponent_stone_color, 0)
+
+            elif len(np.where(self.board == 0)[0]) > 12:
+                self.point = get_good_position(self.board, len(np.where(self.board == 0)[0]), self.my_stone_color,
+                                               self.opponent_stone_color)
+
             else:
-                self.val, self.point = get_max_my_stone(self.board, len(np.where(self.board == 0)[0]), self.alpha,
-                                                        self.beta, True, self.my_stone_color, self.opponent_stone_color,
-                                                        0)
+                val, self.point = get_max_my_stone(self.board, len(np.where(self.board == 0)[0]), -4096, 4096,
+                                                   True, self.my_stone_color, self.opponent_stone_color, 0)
+                print("min_val:", val)
 
-            self.client_msg = serialize({'type': 0, 'point': self.point})
-            self.sock.send(self.client_msg)
+            """
+            
+            """
 
+            self.sock.send(serialize({'type': 0, 'point': self.point}))
+            print(datetime.now() - time1)
         elif msg["type"] == 3:  # ACCEPT
             self.label_3.setText("<p align=\"center\"><span style=\" font-size:20pt; font-weight:600;\">OPPONENT<br>TURN</span></p>")
 
-            self.changed_points = getReversedPosition(self.board, self.my_stone_color, self.point[0], self.point[1])
+            changed_points = get_reversed_position(self.board, self.my_stone_color, self.point[0], self.point[1])
 
-            for i, j in self.changed_points:
+            for i, j in changed_points:
                 self.board[i, j] = self.my_stone_color
                 self.rendering(self.my_stone_color, i, j)
 
@@ -618,7 +620,7 @@ class Ui_MainWindow(object):
                     self.board[i, j] = self.opponent_stone_color
                     self.rendering(self.opponent_stone_color, i, j)
 
-            except KeyError:
+            except:
                 pass
 
             if msg["result"] == 1:
